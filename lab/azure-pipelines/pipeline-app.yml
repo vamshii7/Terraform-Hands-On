@@ -1,0 +1,35 @@
+trigger:
+  branches: { include: [ main ] }
+  paths: { include: [ 'app/*' ] }
+
+variables:
+  BUILD_TAG: $(Build.BuildId)
+
+stages:
+- stage: Build
+  jobs:
+  - job: docker_build
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: AzureCLI@2
+      displayName: 'ACR Login'
+      inputs:
+        azureSubscription: 'sc-azure-arm'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          ACR=$(az acr show -n $(ACR_NAME) --query loginServer -o tsv)
+          echo "ACR_LOGIN_SERVER=$ACR" >> $(Build.SourcesDirectory)/.acrvars
+          az acr login -n $(ACR_NAME)
+
+    - task: Bash@3
+      displayName: 'Docker Build & Push'
+      inputs:
+        targetType: inline
+        script: |
+          source .acrvars
+          docker build -t $ACR_LOGIN_SERVER/tic-tac-toe:$(BUILD_TAG) -f app/Dockerfile .
+          docker push $ACR_LOGIN_SERVER/tic-tac-toe:$(BUILD_TAG)
+
+    - publish: app/k8s
+      artifact: k8s

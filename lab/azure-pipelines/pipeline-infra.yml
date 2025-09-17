@@ -1,0 +1,30 @@
+trigger:
+  branches: { include: [ main ] }
+  paths: { include: [ 'infra/*' ] }
+
+stages:
+- stage: Validate
+  jobs:
+  - job: tf_validate
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: TerraformInstaller@1
+      inputs: { terraformVersion: '1.7.5' }
+
+    - task: TerraformCLI@2
+      displayName: 'Terraform Init (AKS)'
+      inputs:
+        command: 'init'
+        workingDirectory: 'infra/aks'
+        backendType: 'azurerm'
+        backendServiceArm: 'sc-azure-arm'
+        backendAzureRmResourceGroupName: '$(TF_BACKEND_RG)'
+        backendAzureRmStorageAccountName: '$(TF_BACKEND_SA)'
+        backendAzureRmContainerName: '$(TF_BACKEND_CONTAINER)'
+        backendAzureRmKey: '$(TF_BACKEND_KEY_AKS)'
+
+    - task: TerraformCLI@2
+      displayName: 'Terraform Validate'
+      inputs:
+        command: 'validate'
+        workingDirectory: 'infra/aks'

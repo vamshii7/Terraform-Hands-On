@@ -1,0 +1,10 @@
+location        = "Central India"
+rg_name         = "rg-ttt-prod"
+vnet_name       = "vnet-ttt-prod"
+vnet_cidr       = "10.30.0.0/16"
+aks_subnet_cidr = "10.30.1.0/24"
+acr_name        = "acrtttprod"
+aks_name        = "aks-ttt-prod"
+dns_prefix      = "ttt"
+node_count      = 1
+node_size       = "Standard_D4s_v5"
