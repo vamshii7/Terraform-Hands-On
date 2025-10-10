@@ -1,8 +1,8 @@
 variable "prefix" {
     type = string
-    default = "demo"
+    default = "dev"
 }
-variable "location" {
+variable "env" {
     type = string
-    default = "East US"
+    default = "dev"
 }

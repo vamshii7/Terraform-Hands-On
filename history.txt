@@ -1,0 +1,297 @@
+ 1275  sudo apt update && sudo apt install terraform
+ 1276  terraform --version
+ 1280  mkdir terraform
+ 1281  cd terraform/
+ 1309  terraform init
+ 1311  terraform init
+ 1316  cd .. ./ttt/terraform
+ 1318  cd ttt/terraform/
+ 1321  terraform init
+ 1324  terraform validate
+ 1325  terraform apply
+ 1326  terraform plan
+ 1327  terraform apply
+ 1328  terraform destroy
+ 1329  terraform plan
+ 1331  terraform import azurerm_resource_group.rg /subscriptions/5db43b7e-7ec8-40ed-9358-9f8a6adc0baf/resourceGroups/ttt-dev-rg-us-east
+ 1332  cd terraform/
+ 1333  terraform import azurerm_resource_group.rg /subscriptions/5db43b7e-7ec8-40ed-9358-9f8a6adc0baf/resourceGroups/ttt-dev-rg-us-east
+ 1334  terraform init
+ 1335  terraform ls
+ 1336  terraform list
+ 1337  terraform validate
+ 1338  terraform plan
+ 1339  terraform apply
+ 1340  terraform plan
+ 1341  terraform plan -out = tfplan
+ 1342  terraform plan -out=tfplan
+ 1356  terraform plan
+ 1357  terraform apply -autoapprove
+ 1358  terraform apply -autoapprove yes
+ 1359  terraform apply -auto-approve
+ 1360  terraform plan
+ 1361  terraform import azurerm_virtual_machine.vm /subscriptions/5db43b7e-7ec8-40ed-9358-9f8a6adc0baf/resourcegroups/ttt-dev-rg-us-east/providers/Microsoft.Compute/virtualMachines/TestVM
+ 1362  terraform import azurerm_virtual_machine.vm /subscriptions/5db43b7e-7ec8-40ed-9358-9f8a6adc0baf/resourceGroups/ttt-dev-rg-us-east/providers/Microsoft.Compute/virtualMachines/TestVM
+ 1363  terraform destroy -target=azurerm_virtual_machine.vm
+ 1364  terraform destroy
+ 1365  terraform plan -generate-config-out=generated_config.tf
+ 1366  terraform apply
+ 1367  terraform plan
+ 1368  terraform apply
+ 1369  terraform apply -auto-appprove
+ 1370  terraform apply -auto-approve
+ 1371  terraform plan
+ 1372  terraform apply -auto-approve
+ 1373  terraform destroy -auto-approve
+ 1376  cd terraform/
+ 1379  terraform init
+ 1380  terraform plan
+ 1381  terraform apply -auto-approve
+ 1382  terraform destroy
+ 1391  terraform workspace select prod
+ 1392  terraform workspace list
+ 1393  cd terraform/
+ 1394  terraform workspace list
+ 1395  terraform workspace select prod
+ 1396  terraform apply -var-file='prod.tfvars'
+ 1397  terraform destroy -var-file='prod.tfvars'
+ 1399  terraform destroy -var-file='prod.tfvars' -auto-approve
+ 1400  terraform destroy -var-file='prod.tfvars' -auto-approve -lock=false
+ 1401  terraform state list
+ 1402  cd terraform/
+ 1403  terraform validate
+ 1404  terraform workspace list
+ 1551  cd terraform/
+ 1552  terraform init
+ 1553  terraform workspace list
+ 1554  terraform plan
+ 1555  terraform plan -var-file=dev.tfvars
+ 1556  terraform fmt
+ 1557  terraform apply -var-file=dev.tfvars
+ 1558  terraform destry -auto-approve
+ 1559  terraform destroy -auto-approve
+ 1560  terraform destroy -var-file=dev.tfvars -auto-approve
+ 1601  cd terraform/
+ 1602  terraform validate
+ 1603  terraform init
+ 1604  terraform plan -var-file=dev.tfvars -out=tfplan
+ 1605  terraform apply tfplan -auto-approve
+ 1606  terraform apply -var-file=dev.tfvars -auto-approve
+ 1608  terraform workspace select prod
+ 1609  terraform validate
+ 1610  terraform plan -var-file=prod.tfvars -out=prodplan
+ 1611  terraform apply "prodplan" -auto-approve
+ 1612  terraform apply "prodplan"
+ 1613  terraform workspace select dev
+ 1615  terraform destroy -target
+ 1616  terraform destroy -target azurerm_public_ip.ip
+ 1617  terraform destroy -target=azurerm_public_ip.vm_ip
+ 1618  terraform destroy -var-file=dev.tfvars -target=azurerm_public_ip.vm_ip
+ 1619  terraform destroy -var-file=dev.tfvars azurerm_resource_group.rg
+ 1620  terraform destroy -var-file=dev.tfvars -target=azurerm_resource_group.rg
+ 1621  terraform workspace select prod
+ 1622  terraform apply -var-file=prod.tfvars
+ 1623  terraform plam -var-file=prod.tfvars
+ 1624  terraform plan -var-file=prod.tfvars
+ 1625  terraform state rm azurerm_virtual_machine_vm
+ 1626  terraform state rm azurerm_virtual_machine_vm[0]
+ 1627  terraform state rm azurerm_virtual_machine.vm[0]
+ 1628  terraform plan -var-file=prod.tfvars
+ 1629  terraform destroy -auto-approve
+ 1630  terraform destroy -var-file=prod.tfvars -auto-approve
+ 1631  terraform destroy -var-file=prod.tfvars
+ 1632  terraform state refresh
+ 1633  terraform refresh
+ 1634  terraform refresh -var-file=prod.tfvars
+ 1635  terraform destroy -var-file=prod.tfvars -target=azrerm_resource_group.rg
+ 1636  terraform destroy -var-file=prod.tfvars
+ 1637  terraform workspace
+ 1638  terraform workspace list
+ 1639  terraform workspace select default
+ 1642  cp ../terraform/provider.tf .
+ 1643  cp ../terraform/dev.tfvars .
+ 1644  terraform init
+ 1645  terraform fmt
+ 1646  terraform validate
+ 1647  terraform init
+ 1655  terraform plan
+ 1657  terraform state rm azurerm_network_security_group.group1
+ 1659  terraform validate
+ 1660  terraform plan
+ 1661  terraform apply -auto-approve
+ 1662  terraform plan
+ 1663  terraform apply -auto-approve
+ 1664  terraform plan
+ 1665  terraform apply -auto-approve
+ 1666  terraform import azurerm_network_security_group.group1 /subscriptions/5db43b7e-7ec8-40ed-9358-9f8a6adc0baf/resourceGroups/ttt-default-rg/providers/Microsoft.Network/networkSecurityGroups/default-nic-1-nsg
+ 1667  terraform plan -generate-config-out="generated_resources.tf"
+ 1673  terraform workspace list
+ 1674  terraform workspace select dev
+ 1675  terraform workspace new dev
+ 1676  terraform workspace list
+ 1677  terraform workspace delete dev
+ 1678  terraform workspace select default
+ 1679  terraform workspace delete dev
+ 1680  rm terraform.tfstate.*
+ 1685  cd ttt/terraform/
+ 1709  terraform destroy -auto-approve
+ 1711  terraform init
+ 1712  terraform init -backend-config=backend-def.hcl
+ 1713  terraform init
+ 1714  terraform init -upgrade
+ 1719  terraform init -backend-config=backend-def.hcl
+ 1721  terraform init
+ 1722  terraform init -backend-config=backend-def.hcl
+ 1723  terraform plan
+ 1725  rm .terraform.*
+ 1726  rm terraform.tfstate
+ 1727  rm terraform.tfstate.backup 
+ 1728  rm terraform.tfstate
+ 1729  cd .terraform/
+ 1730  rm terraform.tfstate
+ 1731  rm -r terraform.tfstate.d
+ 1732  rmdir terraform.tfstate.d
+ 1733  rm -R terraform.tfstate.d
+ 1735  rm -R terraform.tfstate.d
+ 1736  terraform workspace new dev
+ 1737  terraform init -backend-config=backend-def.hcl
+ 1738  terraform workspace new dev
+ 1739  terraform workspace select default
+ 1740  terraform workspace list
+ 1741  cd ../terraform/
+ 1742  terraform init -upgrade
+ 1743  terraform init -upgrade -backend-file=dev-tfstate.hcl
+ 1744  terraform init -upgrade -backend-file="dev-tfstate.hcl"
+ 1745  terraform init -backend-config=dev-tfstate.hcl
+ 1746  terraform init -upgrade
+ 1747  terraform plan -var-file=dev.tfvars
+ 1748  terraform init -migrate-state
+ 1749  terraform workspace select dev
+ 1750  terraform workspace new dev
+ 1751  terraform state push ./terraform.tfstate.d/dev/terraform.tfstate
+ 1752  terraform workspace new prod
+ 1753  terraform state push ./terraform.tfstate.d/prod/terraform.tfstate
+ 1754  terraform workspace select dev
+ 1755  terraform init -migrate-state
+ 1756  terraform workspace select prod
+ 1757  terraform init -migrate-state
+ 1758  terraform workspace select dev
+ 1765  terraform plan
+ 1766  terraform workspace select default
+ 1767  terraform init -backend-config="dev-tfstate.hcl"
+ 1768  terraform init
+ 1769  terraform init -reconfigure
+ 1770  terraform plan
+ 1771  terraform init
+ 1772  terraform init -migrate-state
+ 1773  terraform init
+ 1774  terraform plan
+ 1775  terraform init
+ 1776  terraform workspace list
+ 1777  terraform workspace select default
+ 1778  terraform plan
+ 1779  terraform apply -auto-approve
+ 1783  cd ../terraform/
+ 1784  terraform plan
+ 1785  terraform init
+ 1795  terraform init
+ 1796  terraform plan
+ 1797  terraform apply -auto-approve
+ 1798  terraform apply
+ 1799  terraform destroy -auto-approve
+ 1801  cd terraform/
+ 1802  terraform init
+ 1804  terraform init
+ 1805  terraform init -backend-config="backend-def.hcl"
+ 1806  terraform state list
+ 1807  terraform workspace list
+ 1808  terraform init
+ 1809  terraform init -backend-config="backend-def.hcl"
+ 1810  terraform init -reconfigure
+ 1811  terraform init -reconfigure -backend-config="backend-def.hcl"
+ 1812  terraform init
+ 1813  terraform workspace list
+ 1814  terraform plan
+ 1815  terraform workspace list
+ 1816  terraform plan
+ 1817  terraform apply -auto-approve
+ 1821  cd terraform/
+ 1822  terraform plan -target=module.stage
+ 1823  terraform -init reconfigure
+ 1824  terraform -reconfigure
+ 1825  terraform -init
+ 1826  terraform reconfigure
+ 1827  terraform -init
+ 1828  terraform init
+ 1829  terraform reconfigure
+ 1830  terraform init
+ 1831  terraform init -backend="dev-tfstate.hcl"
+ 1832  terraform init
+ 1833  terraform init -backend="dev-tfstate.hcl"
+ 1834  terraform init -backend-config="dev-tfstate.hcl"
+ 1835  terraform init -reconfigure
+ 1836  terraform init -backend-config="dev-tfstate.hcl"
+ 1837  terraform init -reconfigure
+ 1838  terraform plan -target=module.stage
+ 1839  terraform init
+ 1840  terraform init -reconfigure
+ 1841  terraform plan -target=module.stage
+ 1842  terraform init -reconfigure
+ 1843  terraform init -backend-config="dev-tfstate.hcl"
+ 1844  terraform init -reconfigure
+ 1845  terraform init -backend-config="/home/vamshi/ttt/count_foreach/dev-tfstate.hcl"
+ 1846  terraform init -reconfigure
+ 1847  terraform init
+ 1848  terraform init -backen-config="dev-tfstate.hcl"
+ 1849  terraform init -backend-config="dev-tfstate.hcl"
+ 1850  terraform init -reconfigure
+ 1851  terraform init
+ 1852  terraform init -migrate-state
+ 1853  terraform init
+ 1855  terraform init -migrate-state
+ 1856  terraform workspace list
+ 1857  cd ../terraform/
+ 1858  terraform workspace list
+ 1859  terraform workspace delete dev prod
+ 1860  terraform workspace delete dev
+ 1861  terraform workspace delete prod
+ 1862  terraform plan -target=module.stage
+ 1863  terraform apply -target=module.stage -auto-approve
+ 1864  terraform destroy -auto-approve
+ 1866  terraform destroy -auto-approve
+ 1873  cd terraform/
+ 1874  terraform destroy
+ 1876  terraform destroy
+ 1878  cd terraform/
+ 1879  terraform fmt
+ 1880  terraform init
+ 1881  terraform plan
+ 1882  terraform apply -auto-approve
+ 1886  terraform init
+ 1887  terraform validate
+ 1888  terraform fmt
+ 1890  cd terraform-modules/
+ 1891  mv terraform.tfvars dev.tfvars
+ 1893  terraform init
+ 1894  terraform init -upgrade
+ 1895  terraform plan
+ 1896  terraform init
+ 1897  terraform plan
+ 1898  terraform apply -var-file="dev.tfvars"
+ 1899  terraform refresh
+ 1900  terraform apply -var-file="dev.tfvars" -auto-approve
+ 1901  terraform destroy -auto-appropve
+ 1902  terraform destroy -auto-approve
+ 1903  terraform refresh
+ 1904  terraform init
+ 1905  terraform plan -var-file="dev.tfvars"
+ 1906  terraform plan -var-file="dev.tfvars" -var-file="prod.tfvars"
+ 1907  terraform aplpy -var-file="dev.tfvars" -var-file="prod.tfvars" -auto-approve
+ 1908  terraform apply -var-file="dev.tfvars" -var-file="prod.tfvars" -auto-approve
+ 1909  terraform destroy -auto-approve
+ 1914  terraform init
+ 1915  terraform apply -auto-approve
+ 1916  terraform apply -replace="azurerm_linux_virtual_machine.vm[1]"
+ 1918  terraform apply -auto-approve
+ 1970  echo ".terraform/" >> .gitignore
+ 1991  history | grep terraform >> history.txt
