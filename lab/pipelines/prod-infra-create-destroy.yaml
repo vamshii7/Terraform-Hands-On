@@ -1,0 +1,109 @@
+name: provision-prod-infra
+
+trigger: none
+
+pool:
+  name: MyAgentPool
+
+stages:
+
+# ==============================
+# Stage 1: Deploy / Apply
+# ==============================
+
+- stage: Deploy
+  displayName: "Deploy AppInfra - Prod"
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+  - job: Terraform_Apply
+    displayName: "Terraform Apply"
+    steps:
+    - checkout: self
+
+    # Install Terraform v1.13.3
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: '1.13.3'
+
+    # Verify Terraform installation
+    - script: |
+        terraform version
+        which terraform
+        echo "Current working directory: $(pwd)"
+      displayName: "Verify Terraform Installation"
+
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'prod.tfstate'
+
+    # Terraform Plan
+    - task: TerraformTask@5
+      displayName: "Terraform Plan"
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+
+    # Terraform Apply
+    - task: TerraformTask@5
+      displayName: "Terraform Apply"
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+
+# ==============================
+# Stage 2: Destroy
+# ==============================
+
+- stage: Destroy
+  displayName: "Destroy AppInfra - Prod"
+  dependsOn: Deploy
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+  - job: Terraform_Destroy
+    displayName: "Terraform Destroy"
+    steps:
+    - checkout: self
+
+    # Install Terraform v1.13.3
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: '1.13.3'
+
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'prod.tfstate'
+
+    # Terraform Destroy
+    - task: TerraformTask@5
+      displayName: "Terraform Destroy"
+      inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'TerraformConnection'
