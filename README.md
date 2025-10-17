@@ -37,3 +37,76 @@ terraform validate
 # Plan and apply
 terraform plan
 terraform apply
+
+## 🧠 Concepts
+
+This repo covers key infrastructure and DevOps concepts:
+
+- 🔧 Infrastructure as Code (IaC) with modular Terraform  
+- ☁️ Azure resource provisioning (VMs, Storage, Networking)  
+- 📦 Terraform state management and remote backends  
+- 🧩 Kubernetes integration (AKS, HPA, NetworkPolicy)  
+- 🔒 Role-based access and secure secrets handling  
+
+---
+
+## ⚙️ CI/CD — Azure DevOps
+
+This project uses **Azure Pipelines** for automated provisioning and validation:
+
+- 🧾 `azure-pipelines.yml` — pipeline for Terraform deployment  
+- 🔐 Secrets managed via Azure DevOps variable groups  
+- 🧹 Linting, validation, and plan previews  
+- 🌸 Auto-cleanup and state locking  
+
+> Self-hosted agents are supported with Terraform binary symlinking and environment setup.
+
+---
+
+## ⏰ Roadmap
+
+Planned enhancements:
+
+- [x] Modular Terraform structure  
+- [x] Azure DevOps pipeline integration  
+- [ ] AKS cluster provisioning with HPA and RBAC  
+- [ ] Helm chart deployment via Terraform  
+- [ ] Monitoring with Azure Insights  
+
+---
+
+## 🤝 Contributing
+
+We welcome improvements, optimizations, and new modules!
+
+```bash
+# Fork the repo
+# Create a feature branch
+git checkout -b feature/my-improvement
+
+# Commit and push
+git commit -m "Add AKS module"
+git push origin feature/my-improvement
+
+## 📚 Resources
+
+- [Terraform Docs](https://developer.hashicorp.com/terraform/docs) ↗️  
+- [Azure DevOps Pipelines](https://learn.microsoft.com/en-us/azure/devops/pipelines) ↗️  
+- [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) ↗️  
+
+---
+
+## 🛡️ License
+
+MIT License — feel free to use, modify, and share.  
+
+---
+
+## ✍️ Authors
+
+👨‍💻 **Vamshi Krishna**  
+DevOps Engineer | DevOps & Kubernetes Enthusiast  
+
+📫 Reach out on [GitHub](https://github.com/vamshii7)  
+🌐 Focus Areas: Terraform, AKS, Azure DevOps, Kubernetes, and Cloud Automation  
+🚀 Building hands-on labs for real-world learning!
