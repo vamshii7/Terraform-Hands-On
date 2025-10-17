@@ -3,8 +3,8 @@
 [![Terraform](https://img.shields.io/badge/Terraform-v1.x-blueviolet?logo=terraform)](https://www.terraform.io/)
 [![Azure](https://img.shields.io/badge/Azure-Cloud-blue?logo=microsoft-azure)](https://azure.microsoft.com/)
 [![CI/CD](https://img.shields.io/badge/Azure%20Pipelines-Enabled-success?logo=azure-pipelines)](https://learn.microsoft.com/en-us/azure/devops/pipelines/)
-[![License](https://img.shields.io/github/license/vamshii7/Terraform-Hands-On)](https://github.com/vamshii7/Terraform-Hands-On/blob/main/LICENSE)
 [![Repo](https://img.shields.io/badge/GitHub-Terraform--Hands--On-black?logo=github)](https://github.com/vamshii7/Terraform-Hands-On)
+<!--[![License](https://img.shields.io/github/license/vamshii7/Terraform-Hands-On)](https://github.com/vamshii7/Terraform-Hands-On/blob/main/LICENSE)-->
 
 ---
 
@@ -20,7 +20,8 @@
 - ✅ [Terraform](https://www.terraform.io/downloads.html) installed and added to your system `PATH`
 - ✅ Azure CLI configured (`az login`)
 - ✅ Azure DevOps organization and project
-- ✅ Self-hosted agent (e.g., VirtualBox VM) or Microsoft-hosted agent
+- ✅ Configured Self-hosted agent (e.g., VirtualBox VM) or Microsoft-hosted agent in agent pool
+- ✅ Configured Service Connection to AZ Account for pipelines to run
 
 ### Getting Started
 ```bash
@@ -28,6 +29,7 @@
 git clone https://github.com/vamshii7/Terraform-Hands-On.git
 cd Terraform-Hands-On
 
+# Navigate to appropriate folder
 # Initialize Terraform
 terraform init
 
@@ -37,7 +39,7 @@ terraform validate
 # Plan and apply
 terraform plan
 terraform apply
-
+```
 ## 🧠 Concepts
 
 This repo covers key infrastructure and DevOps concepts:
@@ -54,12 +56,10 @@ This repo covers key infrastructure and DevOps concepts:
 
 This project uses **Azure Pipelines** for automated provisioning and validation:
 
-- 🧾 `azure-pipelines.yml` — pipeline for Terraform deployment  
+- 🧾 pipeline for Terraform deployment  
 - 🔐 Secrets managed via Azure DevOps variable groups  
 - 🧹 Linting, validation, and plan previews  
 - 🌸 Auto-cleanup and state locking  
-
-> Self-hosted agents are supported with Terraform binary symlinking and environment setup.
 
 ---
 
@@ -87,7 +87,7 @@ git checkout -b feature/my-improvement
 # Commit and push
 git commit -m "Add AKS module"
 git push origin feature/my-improvement
-
+```
 ## 📚 Resources
 
 - [Terraform Docs](https://developer.hashicorp.com/terraform/docs) ↗️  
@@ -107,6 +107,6 @@ MIT License — feel free to use, modify, and share.
 👨‍💻 **Vamshi Krishna**  
 DevOps Engineer | DevOps & Kubernetes Enthusiast  
 
-📫 Reach out on [GitHub](https://github.com/vamshii7)  
+📫 Reach out on [GitHub](https://github.com/vamshii7)  | [LinkedIn](https://www.linkedin.com/in/vamshi7/)  
 🌐 Focus Areas: Terraform, AKS, Azure DevOps, Kubernetes, and Cloud Automation  
 🚀 Building hands-on labs for real-world learning!
