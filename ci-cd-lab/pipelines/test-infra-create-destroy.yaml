@@ -46,7 +46,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/test'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -59,7 +59,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/test'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
     # Terraform Apply
@@ -68,7 +68,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/test'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
@@ -98,7 +98,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/test'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -111,6 +111,6 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/test'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'

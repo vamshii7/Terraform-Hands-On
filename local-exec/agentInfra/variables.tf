@@ -6,7 +6,7 @@ variable "admin_password" {
 
 variable "ado_org_url" {
   type = string
-  default = "https://dev.azure.com/K032"
+  default = "https://dev.azure.com/vamshii7/"
 }
 
 variable "ado_pat" {

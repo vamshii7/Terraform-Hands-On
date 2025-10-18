@@ -61,7 +61,7 @@ stages:
         provider: 'azurerm'
         command: 'plan'
         commandOptions: '-var="vm_count=$(vm_count)"'
-        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/ci-cd-lab/appInfra/prod'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
     # Terraform Apply
