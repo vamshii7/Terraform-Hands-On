@@ -3,7 +3,15 @@ name: provision-prod-infra
 trigger: none
 
 pool:
-  name: MyAgentPool
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: terraformRepo
+      type: github
+      name: vamshii7/Terraform-Hands-On
+      ref: main
+      endpoint: github.com_vamshii7
 
 stages:
 
@@ -18,7 +26,7 @@ stages:
   - job: Terraform_Apply
     displayName: "Terraform Apply"
     steps:
-    - checkout: self
+    - checkout: terraformRepo
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -39,7 +47,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -52,7 +60,8 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        commandOptions: '-var="vm_count=$(vm_count)"'
+        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
     # Terraform Apply
@@ -61,8 +70,8 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
-        commandOptions: '--auto-approve'
+        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
+        commandOptions: '--auto-approve -var="vm_count=$(vm_count)"'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
 # ==============================
@@ -77,7 +86,7 @@ stages:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"
     steps:
-    - checkout: self
+    - checkout: terraformRepo
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -91,7 +100,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -104,6 +113,6 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/lab/appInfra/prod'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'

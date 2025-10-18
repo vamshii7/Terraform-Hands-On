@@ -1,23 +1,30 @@
-name: provision-test-infra
+name: provision-dev-infra
 
 trigger: none
 
 pool:
-  name: MyAgentPool
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: terraformRepo
+      type: github
+      name: vamshii7/Terraform-Hands-On
+      ref: main
+      endpoint: github.com_vamshii7
 
 stages:
 # ==============================
 # Stage 1: Deploy / Apply
 # ==============================
-
 - stage: Deploy
-  displayName: "Deploy AppInfra - Test"
+  displayName: "Deploy AppInfra - Dev"
   condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
   - job: Terraform_Apply
     displayName: "Terraform Apply"
     steps:
-    - checkout: self
+    - checkout: terraformRepo
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -38,12 +45,12 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/dev'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'test.tfstate'
+        backendAzureRmKey: 'dev.tfstate'
 
     # Terraform Plan
     - task: TerraformTask@5
@@ -51,7 +58,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/dev'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
     # Terraform Apply
@@ -60,7 +67,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/dev'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
@@ -69,14 +76,14 @@ stages:
 # ==============================
 
 - stage: Destroy
-  displayName: "Destroy AppInfra - Test"
+  displayName: "Destroy AppInfra - Dev"
   dependsOn: Deploy
   condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"
     steps:
-    - checkout: self
+    - checkout: terraformRepo
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -90,12 +97,12 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/dev'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'test.tfstate'
+        backendAzureRmKey: 'dev.tfstate'
 
     # Terraform Destroy
     - task: TerraformTask@5
@@ -103,6 +110,6 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        workingDirectory: '$(Build.SourcesDirectory)/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/appInfra/dev'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'

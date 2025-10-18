@@ -16,7 +16,7 @@ variable "admin_username" {
 variable "admin_password" {
   type      = string
   sensitive = true
-  default   = "DevPassword!123"
+  default   = "ProdPassword!123"
 }
 variable "vnet_address_space" {
   type    = list(string)
@@ -34,4 +34,5 @@ variable "vm_count" {
 
 variable "prefix" {
   type    = string
+  default = "Prod"
 }
