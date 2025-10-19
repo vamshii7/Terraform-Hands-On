@@ -71,14 +71,34 @@ stages:
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
+# ---------------------------
+# Stage 2: Manual Approval Gate
+# ---------------------------
+- stage: Approval
+  displayName: "Manual Approval Before Destroy"
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: WaitForApproval
+    displayName: "Approve or Reject Destroy"
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        instructions: |
+          Please verify that the VM agent is visible in Azure DevOps > Agent Pools.
+          Approve to proceed with destruction.
+        onTimeout: 'reject'
+
 # ==============================
-# Stage 2: Destroy
+# Stage 3: Destroy
 # ==============================
 
 - stage: Destroy
   displayName: "Destroy AppInfra - Dev"
-  dependsOn: Deploy
-  condition: eq(variables['Build.Reason'], 'Manual')
+  dependsOn: Approval
+  condition: eq(dependencies.Approval.result, 'Succeeded')
   jobs:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"
