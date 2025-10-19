@@ -87,8 +87,7 @@ stages:
       timeoutInMinutes: 1440
       inputs:
         instructions: |
-          Please verify that the VM agent is visible in Azure DevOps > Agent Pools.
-          Approve to proceed with destruction.
+          Approve to proceed with destruction of Dev Infra.
         onTimeout: 'reject'
 
 # ==============================
