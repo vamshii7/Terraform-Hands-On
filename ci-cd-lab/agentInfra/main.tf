@@ -12,7 +12,7 @@ locals {
 # Resource Group (static)
 
 resource "azurerm_resource_group" "rg" {
-  name     = "agent-rg"
+  name     = "${local.vm_name}-rg"
   location = "East US"
 }
 
@@ -118,8 +118,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
 
     inline = [
-      "sudo apt-get update -y",
-      "sudo apt-get install -y curl unzip wget sshpass",
+      "sudo apt-get update -y || true",
+      "sudo apt-get install -y wget tar || true",
       "mkdir -p ~/agent && cd ~/agent",
       "wget https://download.agent.dev.azure.com/agent/4.261.0/vsts-agent-linux-x64-4.261.0.tar.gz",
       "tar zxvf vsts-agent-linux-x64-4.261.0.tar.gz",
@@ -128,14 +128,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
       "sudo ./svc.sh start"
     ]
   }
-}
-
-# Outputs
-
-output "vm_name" {
-  value = azurerm_linux_virtual_machine.vm.name
-}
-
-output "vm_public_ip" {
-  value = azurerm_public_ip.vm_pip.ip_address
 }
