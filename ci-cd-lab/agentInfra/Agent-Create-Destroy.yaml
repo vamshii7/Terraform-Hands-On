@@ -28,7 +28,7 @@ stages:
         
       - script: |
           echo "Files pulled from Repo:"
-          ls -lR agentInfra
+          ls -lR ci-cd-lab/agentInfra
         displayName: "List checked out files"
 
       - task: TerraformInstaller@1
@@ -102,7 +102,7 @@ stages:
         
       - script: |
           echo "Files pulled from Repo:"
-          ls -lR agentInfra
+          ls -lR ci-cd-lab/agentInfra
         displayName: "List checked out files"
 
       - task: TerraformInstaller@1
@@ -130,7 +130,7 @@ stages:
           scriptLocation: inlineScript
           inlineScript: |
             set -euo pipefail
-            cd agentInfra
+            cd ci-cd-lab/agentInfra
 
             # Ensure tools for parsing and SSH are available
             sudo apt-get update -y
