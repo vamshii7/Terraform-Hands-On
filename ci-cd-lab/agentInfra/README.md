@@ -21,11 +21,11 @@ This repository provisions a **minimal Ubuntu VM in Azure** and registers it as 
 ## 📂 Repository Structure
 
 agentInfra/  
-├── main.tf # Creates RG, VNet, Subnet, Public IP, NIC, NSG, and Ubuntu VM  
-├── provider.tf # Provider config + backend stanza  
-├── variables.tf # Declares ado_org_url, ado_pat (sensitive), admin_password  
-├── outputs.tf # Outputs vm_name and vm_public_ip  
-├── azure-pipeline.yaml # Azure DevOps pipeline for provisioning & teardown  
+├── 📜 main.tf # Creates RG, VNet, Subnet, Public IP, NIC, NSG, and Ubuntu VM  
+├── ⚙️ provider.tf # Provider config + backend stanza  
+├── 🛠️ variables.tf # Declares ado_org_url, ado_pat (sensitive), admin_password  
+├── 📤 outputs.tf # Outputs vm_name and vm_public_ip  
+└── 🧩 azure-pipeline.yaml # Azure DevOps pipeline for provisioning & teardown  
 
 
 ---
