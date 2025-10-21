@@ -25,17 +25,11 @@ stages:
     displayName: "Terraform Apply"
     steps:
       - checkout: terraformRepo
-        persistCredentials: true
-        clean: true
-        fetchDepth: 1
-        sparseCheckout:
-          paths:
-            - agentInfra/*.tf
-          
+        
       - script: |
-          echo "Files pulled from GitHub:"
+          echo "Files pulled from Repo:"
           ls -lR agentInfra
-        displayName: "List checked out .tf files"
+        displayName: "List checked out files"
 
       - task: TerraformInstaller@1
         displayName: "Install Terraform"
@@ -105,17 +99,11 @@ stages:
     displayName: "Terraform Destroy"
     steps:
       - checkout: terraformRepo
-        persistCredentials: true
-        clean: true
-        fetchDepth: 1
-        sparseCheckout:
-          paths:
-            - agentInfra/*.tf
-          
+        
       - script: |
-          echo "Files pulled from GitHub:"
+          echo "Files pulled from Repo:"
           ls -lR agentInfra
-        displayName: "List checked out .tf files"
+        displayName: "List checked out files"
 
       - task: TerraformInstaller@1
         displayName: "Install Terraform"
