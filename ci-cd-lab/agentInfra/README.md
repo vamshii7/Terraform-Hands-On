@@ -1,4 +1,4 @@
-# 🚀 Terraform Azure DevOps Self-Hosted Agent (Agent VM)
+# 🚀 Terraform Azure DevOps Self-Hosted Agent (Ubuntu VM)
 
 [![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?logo=terraform)](https://www.terraform.io/) 
 [![Azure DevOps](https://img.shields.io/badge/Azure%20DevOps-Pipeline-0078D7?logo=azuredevops)](https://dev.azure.com/) 
@@ -10,7 +10,7 @@
 ## 📖 Project Summary
 This repository provisions a **minimal Ubuntu VM in Azure** and registers it as an **Azure DevOps self-hosted agent** using Terraform and an Azure DevOps pipeline.  
 
-The pipeline:
+### The pipeline:
 - Runs `terraform init/plan/apply`
 - Captures the VM IP
 - Verifies agent registration in Azure DevOps
@@ -71,7 +71,7 @@ admin_password = "<VM_ADMIN_PASSWORD>"
 
 ```
 
-##🎯 Benefits  
+## 🎯 Benefits  
 - Lifecycle: Fully automated agent lifecycle — provision, register, de-register, destroy
 - Cost: No permanent infra costs — VM exists only when needed
 - Scale: Scalable & reusable — replicate pipeline for multiple agents
@@ -81,13 +81,13 @@ admin_password = "<VM_ADMIN_PASSWORD>"
 - Integration: Seamless DevOps integration — direct pool registration via PAT
 
 
-##✅ Quick start checklist  
+## ✅ Quick start checklist  
 - Configure: Azure service connection and backend storage (if applicable)
 - Create: Variable Group TerraformSecrets with required secrets
 - Run: Execute the pipeline to provision → approve → de-register → destroy
 - Verify: Check Azure DevOps Agent Pools for the new agent during the run
 
-✨ Happy Automating with Terraform + Azure DevOps! 🚀
+### ✨ Happy Automating with Terraform + Azure DevOps! 🚀
 
 
 ## ✍️ Authors
