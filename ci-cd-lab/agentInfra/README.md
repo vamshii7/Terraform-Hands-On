@@ -1,8 +1,8 @@
 # 🚀 Terraform Azure DevOps Self-Hosted Agent (Agent VM)
 
-[![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?logo=terraform)](https://www.terraform.io/)  
-[![Azure DevOps](https://img.shields.io/badge/Azure%20DevOps-Pipeline-0078D7?logo=azuredevops)](https://dev.azure.com/)  
-[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%20LTS-E95420?logo=ubuntu)](https://ubuntu.com/)  
+[![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?logo=terraform)](https://www.terraform.io/) 
+[![Azure DevOps](https://img.shields.io/badge/Azure%20DevOps-Pipeline-0078D7?logo=azuredevops)](https://dev.azure.com/) 
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%20LTS-E95420?logo=ubuntu)](https://ubuntu.com/) 
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
