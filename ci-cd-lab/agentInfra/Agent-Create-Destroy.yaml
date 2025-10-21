@@ -1,0 +1,187 @@
+name: Terraform-Agent-Build-Destroy
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: AgentSecrets
+
+stages:
+- stage: Deploy
+  displayName: "🚀 Deploy VM to AgentPool"
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+  - job: Terraform_Apply
+    displayName: "Terraform Apply"
+    steps:
+    - checkout: self
+
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: 'agentInfra'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'agent.tfstate'
+
+    - task: TerraformTask@5
+      displayName: "Terraform Plan"
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: 'agentInfra'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+        commandOptions: >
+          -var="ado_pat=$(ado_pat)"
+          -var="ado_org_url=$(ado_org_url)"
+          -var="admin_password=$(admin_password)"
+
+    - task: TerraformTask@5
+      displayName: "Terraform Apply"
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: 'agentInfra'
+        environmentServiceNameAzureRM: 'TerraformCOnnection'
+        commandOptions: >
+          -auto-approve
+          -var="ado_pat=$(ado_pat)"
+          -var="ado_org_url=$(ado_org_url)"
+          -var="admin_password=$(admin_password)"
+
+- stage: Approval
+  displayName: "🟡 Manual Approval Before Destroy"
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: WaitForApproval
+    displayName: "Approve or Reject Destroy"
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        instructions: |
+          Please verify that the VM agent is visible in Azure DevOps > Agent Pools.
+          Approve to proceed with destruction.
+        onTimeout: 'reject'
+
+- stage: Destroy
+  displayName: "🔥 Destroy VM from AgentPool"
+  dependsOn: Approval
+  condition: eq(dependencies.Approval.result, 'Succeeded')
+  jobs:
+  - job: Terraform_Destroy
+    displayName: "Terraform Destroy"
+    steps:
+    - checkout: self
+
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: 'agentInfra'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'agent.tfstate'
+
+    - task: AzureCLI@2
+      displayName: "Capture and store VM Public IP"
+      inputs:
+        azureSubscription: 'TerraformConnection'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -euo pipefail
+          cd agentInfra
+
+          # Ensure tools for parsing and SSH are available
+          sudo apt-get update -y
+          sudo apt-get install -y jq sshpass
+
+          # Run terraform output under the authenticated Azure CLI context
+          terraform output -json vm_public_ip > vm_output.json || true
+
+          if [ -s vm_output.json ]; then
+            # Handle both forms: a wrapped object or a direct value
+            VM_IP=$(jq -r 'if type=="object" and has("value") then .value elif (.vm_public_ip? and .vm_public_ip.value?) then .vm_public_ip.value else . end' vm_output.json)
+            if [ -z "$VM_IP" ] || [ "$VM_IP" = "null" ]; then
+              VM_IP=$(jq -r '. | tostring' vm_output.json)
+            fi
+          else
+            echo "vm_output.json is empty or missing"
+            VM_IP=""
+          fi
+
+          echo "Resolved VM IP: $VM_IP"
+          echo "##vso[task.setvariable variable=vm_ip]$VM_IP"
+
+    - task: AzureCLI@2
+      displayName: "De-register Azure DevOps Agent (via SSH)"
+      inputs:
+        azureSubscription: 'TerraformConnection'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -euo pipefail
+          echo "Resolved VM IP from pipeline variable: $(vm_ip)"
+
+          if [ -z "$(vm_ip)" ]; then
+            echo "No VM IP found, skipping de-registration SSH step"
+            exit 0
+          fi
+
+          echo "🧩 Attempting to de-register agent from Azure DevOps at $(vm_ip)..."
+
+          # Quick connectivity test
+          ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=no agent@$(vm_ip) 'echo connected' >/dev/null 2>&1 || true
+
+          # Use sshpass to run de-registration sequence
+          sshpass -p "$(admin_password)" ssh -o StrictHostKeyChecking=no agent@$(vm_ip) << 'EOF'
+            set +e
+            cd ~/agent || { echo "Agent directory not found, skipping de-registration"; exit 0; }
+
+            echo "⏹ Stopping agent service..."
+            sudo ./svc.sh stop || echo "Failed to stop service"
+
+            echo "🗑️ Uninstalling agent service..."
+            sudo ./svc.sh uninstall || echo "Failed to uninstall service"
+
+            echo "🧹 Removing agent configuration..."
+            ./config.sh remove --unattended --auth PAT --token "$(ado_pat)" || echo "Agent config removal failed"
+
+            echo "✅ De-registration attempt complete."
+          EOF
+      continueOnError: true
+
+    - task: TerraformTask@5
+      displayName: "Terraform Destroy"
+      inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        workingDirectory: 'agentInfra'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+        commandOptions: >
+          -auto-approve
+          -var="ado_pat=$(ado_pat)"
+          -var="ado_org_url=$(ado_org_url)"
+          -var="admin_password=$(admin_password)"
