@@ -91,7 +91,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   size                            = "Standard_B1s"
   network_interface_ids           = [azurerm_network_interface.vm_nic.id]
   admin_username                  = "agent"
-  admin_password                  = var.admin_password
+  admin_password                  = var.admin-password
   disable_password_authentication = false
 
   os_disk {
@@ -114,7 +114,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
       type     = "ssh"
       host     = azurerm_public_ip.vm_pip.ip_address
       user     = "agent"
-      password = var.admin_password
+      password = var.admin-password
     }
 
     inline = [
@@ -123,7 +123,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
       "mkdir -p ~/agent && cd ~/agent",
       "wget https://download.agent.dev.azure.com/agent/4.261.0/vsts-agent-linux-x64-4.261.0.tar.gz",
       "tar zxvf vsts-agent-linux-x64-4.261.0.tar.gz",
-      "./config.sh --unattended --url ${var.ado_org_url} --auth pat --token ${var.ado_pat} --pool Default --agent ${local.vm_name} --acceptTeeEula",
+      "./config.sh --unattended --url ${var.ado-org-url} --auth pat --token ${var.ado-pat} --pool Default --agent ${local.vm_name} --acceptTeeEula",
       "sudo ./svc.sh install",
       "sudo ./svc.sh start"
     ]

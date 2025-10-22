@@ -1,13 +1,13 @@
-variable "admin_password" {
+variable "admin-password" {
   type      = string
   sensitive = true
 }
 
-variable "ado_org_url" {
+variable "ado-org-url" {
   type = string
 }
 
-variable "ado_pat" {
+variable "ado-pat" {
   type      = string
   sensitive = true
 }

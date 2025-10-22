@@ -14,7 +14,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: AgentSecrets
+  - group: TerraformSecrets
 
 stages:
 - stage: Deploy
@@ -28,7 +28,7 @@ stages:
         
       - script: |
           echo "Files pulled from Repo:"
-          ls -lR ci-cd-lab/agentInfra
+          ls -lR Terraform+CI-CD/agentInfra
         displayName: "List checked out files"
 
       - task: TerraformInstaller@1
@@ -41,7 +41,7 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'init'
-          workingDirectory: 'ci-cd-lab/agentInfra'
+          workingDirectory: 'Terraform+CI-CD/agentInfra'
           backendServiceArm: 'TerraformConnection'
           backendAzureRmResourceGroupName: 'tfstate-rg'
           backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -53,25 +53,25 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'plan'
-          workingDirectory: 'ci-cd-lab/agentInfra'
+          workingDirectory: 'Terraform+CI-CD/agentInfra'
           environmentServiceNameAzureRM: 'TerraformConnection'
           commandOptions: >
-            -var="ado_pat=$(ado_pat)"
-            -var="ado_org_url=$(ado_org_url)"
-            -var="admin_password=$(admin_password)"
+            -var="ado-pat=$(ado-pat)"
+            -var="ado-org-url=$(ado-org-url)"
+            -var="admin-password=$(admin-password)"
 
       - task: TerraformTask@5
         displayName: "Terraform Apply"
         inputs:
           provider: 'azurerm'
           command: 'apply'
-          workingDirectory: 'ci-cd-lab/agentInfra'
+          workingDirectory: 'Terraform+CI-CD/agentInfra'
           environmentServiceNameAzureRM: 'TerraformConnection'
           commandOptions: >
             -auto-approve
-            -var="ado_pat=$(ado_pat)"
-            -var="ado_org_url=$(ado_org_url)"
-            -var="admin_password=$(admin_password)"
+            -var="ado-pat=$(ado-pat)"
+            -var="ado-org-url=$(ado-org-url)"
+            -var="admin-password=$(admin-password)"
 
 - stage: Approval
   displayName: "🟡 Manual Approval Before Destroy"
@@ -102,7 +102,7 @@ stages:
         
       - script: |
           echo "Files pulled from Repo:"
-          ls -lR ci-cd-lab/agentInfra
+          ls -lR Terraform+CI-CD/agentInfra
         displayName: "List checked out files"
 
       - task: TerraformInstaller@1
@@ -115,7 +115,7 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'init'
-          workingDirectory: 'ci-cd-lab/agentInfra'
+          workingDirectory: 'Terraform+CI-CD/agentInfra'
           backendServiceArm: 'TerraformConnection'
           backendAzureRmResourceGroupName: 'tfstate-rg'
           backendAzureRmStorageAccountName: 'temptfstatesa'
@@ -130,7 +130,7 @@ stages:
           scriptLocation: inlineScript
           inlineScript: |
             set -euo pipefail
-            cd ci-cd-lab/agentInfra
+            cd Terraform+CI-CD/agentInfra
 
             # Ensure tools for parsing and SSH are available
             sudo apt-get update -y
@@ -174,7 +174,7 @@ stages:
             ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=no agent@$(vm_ip) 'echo connected' >/dev/null 2>&1 || true
 
             # Use sshpass to run de-registration sequence
-            sshpass -p "$(admin_password)" ssh -o StrictHostKeyChecking=no agent@$(vm_ip) << 'EOF'
+            sshpass -p "$(admin-password)" ssh -o StrictHostKeyChecking=no agent@$(vm_ip) << 'EOF'
               set +e
               cd ~/agent || { echo "Agent directory not found, skipping de-registration"; exit 0; }
 
@@ -185,7 +185,7 @@ stages:
               sudo ./svc.sh uninstall || echo "Failed to uninstall service"
 
               echo "🧹 Removing agent configuration..."
-              ./config.sh remove --unattended --auth PAT --token "$(ado_pat)" || echo "Agent config removal failed"
+              ./config.sh remove --unattended --auth PAT --token "$(ado-pat)" || echo "Agent config removal failed"
 
               echo "✅ De-registration attempt complete."
             EOF
@@ -196,10 +196,10 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'destroy'
-          workingDirectory: 'ci-cd-lab/agentInfra'
+          workingDirectory: 'Terraform+CI-CD/agentInfra'
           environmentServiceNameAzureRM: 'TerraformConnection'
           commandOptions: >
             -auto-approve
-            -var="ado_pat=$(ado_pat)"
-            -var="ado_org_url=$(ado_org_url)"
-            -var="admin_password=$(admin_password)"
+            -var="ado-pat=$(ado-pat)"
+            -var="ado-org-url=$(ado-org-url)"
+            -var="admin-password=$(admin-password)"
