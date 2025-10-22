@@ -34,5 +34,12 @@ variable "vm_count" {
 
 variable "prefix" {
   type    = string
-  default = "Dev"
+  default = "dev"
+}
+
+variable "subscription_id" {
+  type = string
+}
+variable "tenant_id" {
+ type = string 
 }

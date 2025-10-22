@@ -3,7 +3,7 @@ terraform {
     resource_group_name  = "tfstate-rg"
     storage_account_name = "temptfstatesa"
     container_name       = "tfstate"
-    key                  = "terraform.tfstate"
+    key                  = "agent.tfstate"
   }
   required_providers {
     azurerm = {
@@ -19,4 +19,6 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
 }

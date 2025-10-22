@@ -9,10 +9,10 @@ locals {
   vm_name = "agent-${random_integer.suffix.result}"
 }
 
-# Resource Group (static)
+# Resource Group (Dynamic)
 
 resource "azurerm_resource_group" "rg" {
-  name     = "agent-rg"
+  name     = "${local.vm_name}-rg"
   location = "East US"
 }
 
@@ -119,7 +119,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
     inline = [
       "sudo apt-get update -y",
-      "sudo apt-get install -y curl unzip wget sshpass",
+      "sudo apt-get install -y wget tar libssl-dev libicu-dev libkrb5-dev zlib1g liblttng-ust0 libcurl4 libunwind8 libuuid1",
       "mkdir -p ~/agent && cd ~/agent",
       "wget https://download.agent.dev.azure.com/agent/4.261.0/vsts-agent-linux-x64-4.261.0.tar.gz",
       "tar zxvf vsts-agent-linux-x64-4.261.0.tar.gz",

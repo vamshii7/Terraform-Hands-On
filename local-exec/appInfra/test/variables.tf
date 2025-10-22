@@ -36,3 +36,9 @@ variable "prefix" {
   type    = string
   default = "Test"
 }
+variable "subscription_id" {
+  type = string
+}
+variable "tenant_id" {
+ type = string 
+}
