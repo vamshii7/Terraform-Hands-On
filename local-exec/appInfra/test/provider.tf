@@ -3,7 +3,7 @@ terraform {
     resource_group_name  = "tfstate-rg"
     storage_account_name = "temptfstatesa"
     container_name       = "tfstate"
-    key                  = "agent.tfstate"
+    key                  = "test.tfstate"
   }
   required_providers {
     azurerm = {

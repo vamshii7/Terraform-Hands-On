@@ -34,5 +34,5 @@ variable "vm_count" {
 
 variable "prefix" {
   type    = string
-  default = "dev"
+  default = "Dev"
 }
