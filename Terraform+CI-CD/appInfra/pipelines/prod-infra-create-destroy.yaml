@@ -1,4 +1,4 @@
-name: provision-prod-infra
+name: ProdInfra-Create-Destroy
 
 trigger: none
 
