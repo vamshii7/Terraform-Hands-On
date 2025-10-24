@@ -17,7 +17,6 @@ stages:
 # ==============================
 # Stage 1: Deploy / Apply
 # ==============================
-
 - stage: Deploy
   displayName: "Deploy AppInfra - Test"
   condition: eq(variables['Build.Reason'], 'Manual')
@@ -72,14 +71,33 @@ stages:
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
+# ---------------------------
+# Stage 2: Manual Approval Gate
+# ---------------------------
+- stage: Approval
+  displayName: "Manual Approval Before Destroy"
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: WaitForApproval
+    displayName: "Approve or Reject Destroy"
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        instructions: |
+          Approve to proceed with destruction of Test Infra.
+        onTimeout: 'reject'
+
 # ==============================
-# Stage 2: Destroy
+# Stage 3: Destroy
 # ==============================
 
 - stage: Destroy
   displayName: "Destroy AppInfra - Test"
-  dependsOn: Deploy
-  condition: eq(variables['Build.Reason'], 'Manual')
+  dependsOn: Approval
+  condition: eq(dependencies.Approval.result, 'Succeeded')
   jobs:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"

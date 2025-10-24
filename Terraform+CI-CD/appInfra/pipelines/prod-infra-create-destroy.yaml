@@ -14,11 +14,9 @@ resources:
       endpoint: github.com_vamshii7
 
 stages:
-
 # ==============================
 # Stage 1: Deploy / Apply
 # ==============================
-
 - stage: Deploy
   displayName: "Deploy AppInfra - Prod"
   condition: eq(variables['Build.Reason'], 'Manual')
@@ -60,7 +58,6 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        commandOptions: '-var="vm_count=$(vm_count)"'
         workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
@@ -71,17 +68,36 @@ stages:
         provider: 'azurerm'
         command: 'apply'
         workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
-        commandOptions: '--auto-approve -var="vm_count=$(vm_count)"'
+        commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
+# ---------------------------
+# Stage 2: Manual Approval Gate
+# ---------------------------
+- stage: Approval
+  displayName: "Manual Approval Before Destroy"
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: WaitForApproval
+    displayName: "Approve or Reject Destroy"
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        instructions: |
+          Approve to proceed with destruction of Prod Infra.
+        onTimeout: 'reject'
+
 # ==============================
-# Stage 2: Destroy
+# Stage 3: Destroy
 # ==============================
 
 - stage: Destroy
   displayName: "Destroy AppInfra - Prod"
-  dependsOn: Deploy
-  condition: eq(variables['Build.Reason'], 'Manual')
+  dependsOn: Approval
+  condition: eq(dependencies.Approval.result, 'Succeeded')
   jobs:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"
