@@ -25,7 +25,7 @@ agentInfra/
 ├── ⚙️ provider.tf # Provider config + backend stanza  
 ├── 🛠️ variables.tf # Declares ado_org_url, ado_pat (sensitive), admin_password  
 ├── 📤 outputs.tf # Outputs vm_name and vm_public_ip  
-└── 🧩 azure-pipeline.yaml # Azure DevOps pipeline for provisioning & teardown  
+└── 🧩 azure-pipeline(Agent-Create-Destroy.yaml) # Azure DevOps pipeline for provisioning & teardown  
 
 
 ---
