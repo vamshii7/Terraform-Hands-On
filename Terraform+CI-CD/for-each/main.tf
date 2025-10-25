@@ -1,11 +1,18 @@
+locals {
+  # Decode JSON strings into usable maps
+  resource_groups = jsondecode(var.resource_groups)
+  network_details = jsondecode(var.network_details)
+  vm_details      = jsondecode(var.vm_details)
+}
+
 resource "azurerm_resource_group" "this" {
-  for_each = var.resourcedetails
+  for_each = local.resource_groups
   name     = each.value.rg_name
   location = each.value.rg_location
 }
 
 resource "azurerm_virtual_network" "this" {
-  for_each            = var.resourcedetails
+  for_each            = local.network_details
   name                = each.value.vnet_name
   address_space       = [each.value.vnet_cidr]
   location            = azurerm_resource_group.this[each.key].location
@@ -13,15 +20,15 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  for_each             = var.resourcedetails
+  for_each             = local.network_details
   name                 = each.value.subnet_name
-  resource_group_name  = each.value.rg_name
+  resource_group_name  = azurerm_resource_group.this[each.key].name
   virtual_network_name = azurerm_virtual_network.this[each.key].name
   address_prefixes     = [each.value.subnet_cidr]
 }
 
 resource "azurerm_network_interface" "this" {
-  for_each            = var.resourcedetails
+  for_each            = local.vm_details
   name                = "${each.value.vm_name}-nic"
   location            = azurerm_resource_group.this[each.key].location
   resource_group_name = azurerm_resource_group.this[each.key].name
@@ -34,7 +41,7 @@ resource "azurerm_network_interface" "this" {
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
-  for_each              = var.resourcedetails
+  for_each              = local.vm_details
   name                  = each.value.vm_name
   location              = azurerm_resource_group.this[each.key].location
   resource_group_name   = azurerm_resource_group.this[each.key].name
@@ -43,11 +50,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_password        = each.value.vm_password
   disable_password_authentication = false
   network_interface_ids = [azurerm_network_interface.this[each.key].id]
-
-  # admin_ssh_key {
-  #   username   = "adminuser"
-  #   public_key = file("~/.ssh/id_rsa.pub")
-  # }
 
   os_disk {
     caching              = "ReadWrite"

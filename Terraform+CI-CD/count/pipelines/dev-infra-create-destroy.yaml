@@ -1,4 +1,4 @@
-name: ProdInfra-Create-Destroy
+name: DevInfra-Create-Destroy
 
 trigger: none
 
@@ -18,13 +18,17 @@ stages:
 # Stage 1: Deploy / Apply
 # ==============================
 - stage: Deploy
-  displayName: "Deploy AppInfra - Prod"
+  displayName: "Deploy AppInfra - Dev"
   condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
   - job: Terraform_Apply
     displayName: "Terraform Apply"
     steps:
     - checkout: terraformRepo
+    - script: |
+          echo "Files pulled from Repo:"
+          ls -lR Terraform+CI-CD/count/dev
+      displayName: "List checked out files"
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -45,12 +49,12 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/dev'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'prod.tfstate'
+        backendAzureRmKey: 'dev.tfstate'
 
     # Terraform Plan
     - task: TerraformTask@5
@@ -58,7 +62,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/dev'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
     # Terraform Apply
@@ -67,7 +71,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/dev'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'
 
@@ -87,7 +91,7 @@ stages:
       timeoutInMinutes: 1440
       inputs:
         instructions: |
-          Approve to proceed with destruction of Prod Infra.
+          Approve to proceed with destruction of Dev Infra.
         onTimeout: 'reject'
 
 # ==============================
@@ -95,7 +99,7 @@ stages:
 # ==============================
 
 - stage: Destroy
-  displayName: "Destroy AppInfra - Prod"
+  displayName: "Destroy AppInfra - Dev"
   dependsOn: Approval
   condition: eq(dependencies.Approval.result, 'Succeeded')
   jobs:
@@ -103,6 +107,10 @@ stages:
     displayName: "Terraform Destroy"
     steps:
     - checkout: terraformRepo
+    - script: |
+          echo "Files pulled from Repo:"
+          ls -lR Terraform+CI-CD/count/dev
+      displayName: "List checked out files"
 
     # Install Terraform v1.13.3
     - task: TerraformInstaller@1
@@ -116,12 +124,12 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/dev'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'prod.tfstate'
+        backendAzureRmKey: 'dev.tfstate'
 
     # Terraform Destroy
     - task: TerraformTask@5
@@ -129,6 +137,6 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/prod'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/dev'
         commandOptions: '--auto-approve'
         environmentServiceNameAzureRM: 'TerraformConnection'

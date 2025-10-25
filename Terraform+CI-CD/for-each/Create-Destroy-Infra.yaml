@@ -1,9 +1,14 @@
-name: provision-test-infra
+name: Infra-Create-Destroy
 
 trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'
+
+variables:
+- group: ResourceGroupVars
+- group: NetworkVars
+- group: VMVars
 
 resources:
   repositories:
@@ -18,7 +23,7 @@ stages:
 # Stage 1: Deploy / Apply
 # ==============================
 - stage: Deploy
-  displayName: "Deploy AppInfra - Test"
+  displayName: "Deploy Infra"
   condition: eq(variables['Build.Reason'], 'Manual')
   jobs:
   - job: Terraform_Apply
@@ -26,50 +31,58 @@ stages:
     steps:
     - checkout: terraformRepo
 
-    # Install Terraform v1.13.3
+    - script: |
+        echo "Listing Terraform files:"
+        ls -lR $(Build.SourcesDirectory)/Terraform+CI-CD/for-each
+      displayName: "List checked out files"
+
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
         terraformVersion: '1.13.3'
 
-    # Verify Terraform installation
     - script: |
         terraform version
         which terraform
         echo "Current working directory: $(pwd)"
       displayName: "Verify Terraform Installation"
 
-    # Terraform Init
-    - task: TerraformTask@5
+    - task: TerraformTaskV4@4
       displayName: "Terraform Init"
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'test.tfstate'
+        backendAzureRmKey: 'foreach.tfstate'
 
-    # Terraform Plan
-    - task: TerraformTask@5
+    - task: TerraformTaskV4@4
       displayName: "Terraform Plan"
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         environmentServiceNameAzureRM: 'TerraformConnection'
+        commandOptions: >
+          -var='resource_groups=$(resource_groups)'
+          -var='network_details=$(network_details)'
+          -var='vm_details=$(vm_details)'
 
-    # Terraform Apply
-    - task: TerraformTask@5
+    - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/test'
-        commandOptions: '--auto-approve'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         environmentServiceNameAzureRM: 'TerraformConnection'
+        commandOptions: >
+          --auto-approve
+          -var='resource_groups=$(resource_groups)'
+          -var='network_details=$(network_details)'
+          -var='vm_details=$(vm_details)'
 
 # ---------------------------
 # Stage 2: Manual Approval Gate
@@ -87,15 +100,14 @@ stages:
       timeoutInMinutes: 1440
       inputs:
         instructions: |
-          Approve to proceed with destruction of Test Infra.
+          Approve to proceed with destruction of Infra.
         onTimeout: 'reject'
 
 # ==============================
 # Stage 3: Destroy
 # ==============================
-
 - stage: Destroy
-  displayName: "Destroy AppInfra - Test"
+  displayName: "Destroy Infra"
   dependsOn: Approval
   condition: eq(dependencies.Approval.result, 'Succeeded')
   jobs:
@@ -104,31 +116,37 @@ stages:
     steps:
     - checkout: terraformRepo
 
-    # Install Terraform v1.13.3
+    - script: |
+        echo "Listing Terraform files:"
+        ls -lR $(Build.SourcesDirectory)/Terraform+CI-CD/for-each
+      displayName: "List checked out files"
+
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
         terraformVersion: '1.13.3'
 
-    # Terraform Init
-    - task: TerraformTask@5
+    - task: TerraformTaskV4@4
       displayName: "Terraform Init"
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/test'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         backendServiceArm: 'TerraformConnection'
         backendAzureRmResourceGroupName: 'tfstate-rg'
         backendAzureRmStorageAccountName: 'temptfstatesa'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'test.tfstate'
+        backendAzureRmKey: 'foreach.tfstate'
 
-    # Terraform Destroy
-    - task: TerraformTask@5
+    - task: TerraformTaskV4@4
       displayName: "Terraform Destroy"
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/appInfra/test'
-        commandOptions: '--auto-approve'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         environmentServiceNameAzureRM: 'TerraformConnection'
+        commandOptions: >
+          --auto-approve
+          -var='resource_groups=$(resource_groups)'
+          -var='network_details=$(network_details)'
+          -var='vm_details=$(vm_details)'

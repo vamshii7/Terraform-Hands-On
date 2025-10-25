@@ -12,22 +12,8 @@ variable "resourcedetails" {
     vnet_name   = string
     subnet_name = string
     vm_name     = string
+    vm_password = string
+    vnet_cidr   = string
+    subnet_cidr = string
   }))
-
-  default = {
-    DevInfra = {
-      rg_name     = "dev-rg"
-      rg_location = "East US"
-      vnet_name   = "dev-vnet"
-      subnet_name = "dev-subnet"
-      vm_name     = "dev-vm"
-    }
-    ProdInfra = {
-      rg_name     = "prod-rg"
-      rg_location = "East US"
-      vnet_name   = "prod-vnet"
-      subnet_name = "prod-subnet"
-      vm_name     = "prod-vm"
-    }
-  }
 }

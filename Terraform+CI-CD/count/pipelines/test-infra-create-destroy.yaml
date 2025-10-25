@@ -1,0 +1,142 @@
+name: TestInfra-Create-Destroy
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: terraformRepo
+      type: github
+      name: vamshii7/Terraform-Hands-On
+      ref: main
+      endpoint: github.com_vamshii7
+
+stages:
+# ==============================
+# Stage 1: Deploy / Apply
+# ==============================
+- stage: Deploy
+  displayName: "Deploy AppInfra - Test"
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+  - job: Terraform_Apply
+    displayName: "Terraform Apply"
+    steps:
+    - checkout: terraformRepo
+    - script: |
+          echo "Files pulled from Repo:"
+          ls -lR Terraform+CI-CD/count/test
+      displayName: "List checked out files"
+
+    # Install Terraform v1.13.3
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: '1.13.3'
+
+    # Verify Terraform installation
+    - script: |
+        terraform version
+        which terraform
+        echo "Current working directory: $(pwd)"
+      displayName: "Verify Terraform Installation"
+
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/test'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'test.tfstate'
+
+    # Terraform Plan
+    - task: TerraformTask@5
+      displayName: "Terraform Plan"
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/test'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+
+    # Terraform Apply
+    - task: TerraformTask@5
+      displayName: "Terraform Apply"
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/test'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'TerraformConnection'
+
+# ---------------------------
+# Stage 2: Manual Approval Gate
+# ---------------------------
+- stage: Approval
+  displayName: "Manual Approval Before Destroy"
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: WaitForApproval
+    displayName: "Approve or Reject Destroy"
+    pool: server
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        instructions: |
+          Approve to proceed with destruction of Test Infra.
+        onTimeout: 'reject'
+
+# ==============================
+# Stage 3: Destroy
+# ==============================
+
+- stage: Destroy
+  displayName: "Destroy AppInfra - Test"
+  dependsOn: Approval
+  condition: eq(dependencies.Approval.result, 'Succeeded')
+  jobs:
+  - job: Terraform_Destroy
+    displayName: "Terraform Destroy"
+    steps:
+    - checkout: terraformRepo
+    - script: |
+          echo "Files pulled from Repo:"
+          ls -lR Terraform+CI-CD/count/test
+      displayName: "List checked out files"
+
+    # Install Terraform v1.13.3
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: '1.13.3'
+
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/test'
+        backendServiceArm: 'TerraformConnection'
+        backendAzureRmResourceGroupName: 'tfstate-rg'
+        backendAzureRmStorageAccountName: 'temptfstatesa'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'test.tfstate'
+
+    # Terraform Destroy
+    - task: TerraformTask@5
+      displayName: "Terraform Destroy"
+      inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/count/test'
+        commandOptions: '--auto-approve'
+        environmentServiceNameAzureRM: 'TerraformConnection'
