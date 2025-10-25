@@ -20,18 +20,18 @@ variable "vm_details" {
     vm_password = string
   }))
 }
-# Raw JSON strings coming from pipeline variable groups
-variable "resource_groups" {
-  description = "JSON string containing resource group details per environment"
-  type        = string
-}
+# # Raw JSON strings coming from pipeline variable groups
+# variable "resource_groups" {
+#   description = "JSON string containing resource group details per environment"
+#   type        = string
+# }
 
-variable "network_details" {
-  description = "JSON string containing network details per environment"
-  type        = string
-}
+# variable "network_details" {
+#   description = "JSON string containing network details per environment"
+#   type        = string
+# }
 
-variable "vm_details" {
-  description = "JSON string containing VM details per environment"
-  type        = string
-}
+# variable "vm_details" {
+#   description = "JSON string containing VM details per environment"
+#   type        = string
+# }

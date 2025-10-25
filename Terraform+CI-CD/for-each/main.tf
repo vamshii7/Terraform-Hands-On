@@ -1,18 +1,18 @@
-locals {
-  # Decode JSON strings into usable maps
-  resource_groups = jsondecode(var.resource_groups)
-  network_details = jsondecode(var.network_details)
-  vm_details      = jsondecode(var.vm_details)
-}
+# locals {
+#   # Decode JSON strings into usable maps
+#   resource_groups = jsondecode(var.resource_groups)
+#   network_details = jsondecode(var.network_details)
+#   vm_details      = jsondecode(var.vm_details)
+# }
 
 resource "azurerm_resource_group" "this" {
-  for_each = local.resource_groups
+  for_each = var.resource_groups
   name     = each.value.rg_name
   location = each.value.rg_location
 }
 
 resource "azurerm_virtual_network" "this" {
-  for_each            = local.network_details
+  for_each            = var.network_details
   name                = each.value.vnet_name
   address_space       = [each.value.vnet_cidr]
   location            = azurerm_resource_group.this[each.key].location
@@ -20,7 +20,7 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  for_each             = local.network_details
+  for_each             = var.network_details
   name                 = each.value.subnet_name
   resource_group_name  = azurerm_resource_group.this[each.key].name
   virtual_network_name = azurerm_virtual_network.this[each.key].name
@@ -28,7 +28,7 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_network_interface" "this" {
-  for_each            = local.vm_details
+  for_each            = var.vm_details
   name                = "${each.value.vm_name}-nic"
   location            = azurerm_resource_group.this[each.key].location
   resource_group_name = azurerm_resource_group.this[each.key].name
@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "this" {
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
-  for_each              = local.vm_details
+  for_each              = var.vm_details
   name                  = each.value.vm_name
   location              = azurerm_resource_group.this[each.key].location
   resource_group_name   = azurerm_resource_group.this[each.key].name
