@@ -5,6 +5,46 @@ locals {
   vm_details      = jsondecode(var.vm_details)
 }
 
+# -------------------------
+# Debug outputs
+# -------------------------
+
+# Raw strings (exactly as passed from pipeline)
+output "debug_resource_groups_raw" {
+  value = var.resource_groups
+  sensitive = true   # mark sensitive to avoid leaking in logs
+}
+
+output "debug_network_details_raw" {
+  value = var.network_details
+  sensitive = true
+}
+
+output "debug_vm_details_raw" {
+  value = var.vm_details
+  sensitive = true
+}
+
+# Decoded maps (usable in for_each)
+output "debug_resource_groups_decoded" {
+  value = local.resource_groups
+}
+
+output "debug_network_details_decoded" {
+  value = local.network_details
+}
+
+output "debug_vm_details_decoded" {
+  value = {
+    for k, v in local.vm_details :
+    k => {
+      vm_name = v.vm_name
+      # mask the password so it doesn’t print in logs
+      vm_password = "*****"
+    }
+  }
+}
+
 resource "azurerm_resource_group" "this" {
   for_each = local.resource_groups
   name     = each.value.rg_name
