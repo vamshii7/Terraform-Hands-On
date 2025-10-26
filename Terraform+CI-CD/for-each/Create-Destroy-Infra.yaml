@@ -28,11 +28,11 @@ stages:
       inputs:
         terraformVersion: '1.13.3'
 
-    # Write variable groups into tfvars.json files with top-level variable names
+    # Write variable groups directly to tfvars.json files
     - script: |
-        echo "{\"resource_groups\": $(resource_groups)}" > resource_groups.auto.tfvars.json
-        echo "{\"network_details\": $(network_details)}" > network_details.auto.tfvars.json
-        echo "{\"vm_details\": $(vm_details)}" > vm_details.auto.tfvars.json
+        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
+        echo '$(network_details)' > network_details.auto.tfvars.json
+        echo '$(vm_details)' > vm_details.auto.tfvars.json
       workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
       displayName: "Write variable groups to tfvars.json"
 
@@ -106,9 +106,9 @@ stages:
         terraformVersion: '1.13.3'
 
     - script: |
-        echo "{\"resource_groups\": $(resource_groups)}" > resource_groups.auto.tfvars.json
-        echo "{\"network_details\": $(network_details)}" > network_details.auto.tfvars.json
-        echo "{\"vm_details\": $(vm_details)}" > vm_details.auto.tfvars.json
+        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
+        echo '$(network_details)' > network_details.auto.tfvars.json
+        echo '$(vm_details)' > vm_details.auto.tfvars.json
       workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
       displayName: "Write variable groups to tfvars.json"
 
