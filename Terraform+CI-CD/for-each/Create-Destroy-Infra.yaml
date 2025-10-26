@@ -10,18 +10,15 @@ variables:
 - group: NetworkVars
 - group: VMVars
 
-resources:
-  repositories:
-    - repository: terraformRepo
-      type: github
-      name: vamshii7/Terraform-Hands-On
-      ref: main
-      endpoint: github.com_vamshii7
+# resources:
+#   repositories:
+#     - repository: terraformRepo
+#       type: github
+#       name: vamshii7/Terraform-Hands-On
+#       ref: main
+#       endpoint: github.com_vamshii7
 
 stages:
-# ==============================
-# Stage 1: Deploy / Apply
-# ==============================
 - stage: Deploy
   displayName: "Deploy Infra"
   condition: eq(variables['Build.Reason'], 'Manual')
@@ -29,23 +26,20 @@ stages:
   - job: Terraform_Apply
     displayName: "Terraform Apply"
     steps:
-    - checkout: terraformRepo
-
-    - script: |
-        echo "Listing Terraform files:"
-        ls -lR $(Build.SourcesDirectory)/Terraform+CI-CD/for-each
-      displayName: "List checked out files"
+    - checkout: self
 
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
         terraformVersion: '1.13.3'
 
+    # Write variable groups into tfvars.json files
     - script: |
-        terraform version
-        which terraform
-        echo "Current working directory: $(pwd)"
-      displayName: "Verify Terraform Installation"
+        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
+        echo '$(network_details)' > network_details.auto.tfvars.json
+        echo '$(vm_details)' > vm_details.auto.tfvars.json
+      workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
+      displayName: "Write variable groups to tfvars.json"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Init"
@@ -67,15 +61,7 @@ stages:
         workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
-          -var="resource_groups='$(resource_groups)'"
-          -var="network_details='$(network_details)'"
-          -var="vm_details='$(vm_details)'"
-
-    - script: |
-        echo "resource_groups: $(resource_groups)"
-        echo "network_details: $(network_details)"
-        echo "vm_details: $(vm_details)"
-      displayName: "Debug variable values"
+          -input=false
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
@@ -86,20 +72,14 @@ stages:
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
           --auto-approve
-          -var="resource_groups='$(resource_groups)'"
-          -var="network_details='$(network_details)'"
-          -var="vm_details='$(vm_details)'"
+          -input=false
 
-# ---------------------------
-# Stage 2: Manual Approval Gate
-# ---------------------------
 - stage: Approval
   displayName: "Manual Approval Before Destroy"
   dependsOn: Deploy
   condition: succeeded()
   jobs:
   - job: WaitForApproval
-    displayName: "Approve or Reject Destroy"
     pool: server
     steps:
     - task: ManualValidation@0
@@ -109,9 +89,6 @@ stages:
           Approve to proceed with destruction of Infra.
         onTimeout: 'reject'
 
-# ==============================
-# Stage 3: Destroy
-# ==============================
 - stage: Destroy
   displayName: "Destroy Infra"
   dependsOn: Approval
@@ -120,17 +97,19 @@ stages:
   - job: Terraform_Destroy
     displayName: "Terraform Destroy"
     steps:
-    - checkout: terraformRepo
-
-    - script: |
-        echo "Listing Terraform files:"
-        ls -lR $(Build.SourcesDirectory)/Terraform+CI-CD/for-each
-      displayName: "List checked out files"
+    - checkout: self
 
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
         terraformVersion: '1.13.3'
+
+    - script: |
+        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
+        echo '$(network_details)' > network_details.auto.tfvars.json
+        echo '$(vm_details)' > vm_details.auto.tfvars.json
+      workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
+      displayName: "Write variable groups to tfvars.json"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Init"
@@ -153,6 +132,4 @@ stages:
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
           --auto-approve
-          -var="resource_groups='$(resource_groups)'"
-          -var="network_details='$(network_details)'"
-          -var="vm_details='$(vm_details)'"
+          -input=false
