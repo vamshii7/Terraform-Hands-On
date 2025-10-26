@@ -1,8 +1,7 @@
 locals {
-  # Decode JSON strings into usable maps
-  resource_groups = jsondecode(var.resource_groups)
-  network_details = jsondecode(var.network_details)
-  vm_details      = jsondecode(var.vm_details)
+  resource_groups = var.resource_groups
+  network_details = var.network_details
+  vm_details      = var.vm_details
 }
 
 # -------------------------
