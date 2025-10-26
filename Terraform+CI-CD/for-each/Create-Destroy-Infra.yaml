@@ -10,15 +10,10 @@ variables:
 - group: NetworkVars
 - group: VMVars
 
-# resources:
-#   repositories:
-#     - repository: terraformRepo
-#       type: github
-#       name: vamshii7/Terraform-Hands-On
-#       ref: main
-#       endpoint: github.com_vamshii7
-
 stages:
+# ==============================
+# Stage 1: Deploy / Apply
+# ==============================
 - stage: Deploy
   displayName: "Deploy Infra"
   condition: eq(variables['Build.Reason'], 'Manual')
@@ -33,11 +28,11 @@ stages:
       inputs:
         terraformVersion: '1.13.3'
 
-    # Write variable groups into tfvars.json files
+    # Write variable groups into tfvars.json files with top-level variable names
     - script: |
-        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
-        echo '$(network_details)' > network_details.auto.tfvars.json
-        echo '$(vm_details)' > vm_details.auto.tfvars.json
+        echo "{\"resource_groups\": $(resource_groups)}" > resource_groups.auto.tfvars.json
+        echo "{\"network_details\": $(network_details)}" > network_details.auto.tfvars.json
+        echo "{\"vm_details\": $(vm_details)}" > vm_details.auto.tfvars.json
       workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
       displayName: "Write variable groups to tfvars.json"
 
@@ -74,6 +69,9 @@ stages:
           --auto-approve
           -input=false
 
+# ---------------------------
+# Stage 2: Manual Approval Gate
+# ---------------------------
 - stage: Approval
   displayName: "Manual Approval Before Destroy"
   dependsOn: Deploy
@@ -89,6 +87,9 @@ stages:
           Approve to proceed with destruction of Infra.
         onTimeout: 'reject'
 
+# ==============================
+# Stage 3: Destroy
+# ==============================
 - stage: Destroy
   displayName: "Destroy Infra"
   dependsOn: Approval
@@ -105,9 +106,9 @@ stages:
         terraformVersion: '1.13.3'
 
     - script: |
-        echo '$(resource_groups)' > resource_groups.auto.tfvars.json
-        echo '$(network_details)' > network_details.auto.tfvars.json
-        echo '$(vm_details)' > vm_details.auto.tfvars.json
+        echo "{\"resource_groups\": $(resource_groups)}" > resource_groups.auto.tfvars.json
+        echo "{\"network_details\": $(network_details)}" > network_details.auto.tfvars.json
+        echo "{\"vm_details\": $(vm_details)}" > vm_details.auto.tfvars.json
       workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
       displayName: "Write variable groups to tfvars.json"
 
