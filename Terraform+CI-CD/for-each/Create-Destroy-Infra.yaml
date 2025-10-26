@@ -67,9 +67,15 @@ stages:
         workingDirectory: '$(Build.SourcesDirectory)/Terraform+CI-CD/for-each'
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
-          -var="resource_groups=$(resource_groups)"
-          -var="network_details=$(network_details)"
-          -var="vm_details=$(vm_details)"
+          -var="resource_groups='$(resource_groups)'"
+          -var="network_details='$(network_details)'"
+          -var="vm_details='$(vm_details)'"
+
+    - script: |
+        echo "resource_groups: $(resource_groups)"
+        echo "network_details: $(network_details)"
+        echo "vm_details: $(vm_details)"
+      displayName: "Debug variable values"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
@@ -80,9 +86,9 @@ stages:
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
           --auto-approve
-          -var="resource_groups=$(resource_groups)"
-          -var="network_details=$(network_details)"
-          -var="vm_details=$(vm_details)"
+          -var="resource_groups='$(resource_groups)'"
+          -var="network_details='$(network_details)'"
+          -var="vm_details='$(vm_details)'"
 
 # ---------------------------
 # Stage 2: Manual Approval Gate
@@ -147,6 +153,6 @@ stages:
         environmentServiceNameAzureRM: 'TerraformConnection'
         commandOptions: >
           --auto-approve
-          -var="resource_groups=$(resource_groups)"
-          -var="network_details=$(network_details)"
-          -var="vm_details=$(vm_details)"
+          -var="resource_groups='$(resource_groups)'"
+          -var="network_details='$(network_details)'"
+          -var="vm_details='$(vm_details)'"
