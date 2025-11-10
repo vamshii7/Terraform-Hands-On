@@ -23,7 +23,7 @@
 - ✅ Configured Self-hosted agent (e.g., VirtualBox VM) or Microsoft-hosted agent in agent pool
 - ✅ Configured Service Connection to AZ Account for pipelines to run
 
-### Getting Started
+### Getting Started  
 ```bash
 # Clone the repo
 git clone https://github.com/vamshii7/Terraform-Hands-On.git
