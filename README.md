@@ -18,7 +18,7 @@
 
 ### Prerequisites
 - ✅ [Terraform](https://www.terraform.io/downloads.html) installed and added to your system `PATH`
-- ✅ [Azure CLI]([https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest](https://learn.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest)) configured (`az login`)
+- ✅ [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest](https://learn.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest ) configured (`az login`)
 - ✅ Azure DevOps organization and project
 - ✅ Configured Self-hosted agent (e.g., VirtualBox VM) or Microsoft-hosted agent in agent pool
 - ✅ Configured Service Connection to AZ Account for pipelines to run
